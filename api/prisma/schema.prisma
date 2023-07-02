@@ -11,10 +11,43 @@ datasource db {
 }
 
 model User {
-  id       String @id @db.Uuid @default(uuid())
+  id       String @id @default(uuid()) @db.Uuid
   name     String
   email    String @unique
   password String
 
+  bankAccounts BankAccount[]
+  Category     Category[]
+
   @@map("users")
+}
+
+enum BankAccountType {
+  CHECKING
+  INVESTMENT
+  CASH
+
+  @@map("bank_account_type")
+}
+
+model BankAccount {
+  id             String          @id @default(uuid()) @db.Uuid
+  userId         String          @map("user_id") @db.Uuid
+  initialBalance Float           @map("initial_balance")
+  name           String
+  color          String
+  type           BankAccountType @default(CHECKING)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("bank_accounts")
+}
+
+model Category {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  name   String
+  icon   String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
